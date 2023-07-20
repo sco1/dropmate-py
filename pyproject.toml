@@ -15,15 +15,30 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Typing :: Typed",
 ]
 
+include = [
+    {path = "./CHANGELOG.md", format = "sdist"}
+]
+
+[tool.poetry.urls]
+"Issue Tracker" = "https://github.com/sco1/dropmate-py/issues"
+
+[tool.poetry.scripts]
+dropmate = "dropmate_py.cli:dropmate_cli"
+
 [tool.poetry.dependencies]
 python = "^3.10"
+python-dotenv = "^1.0"
+sco1-misc = "^0.1"
+typer = "^0.9"
 
 [tool.poetry.dev-dependencies]
 black = "^23.1"
 bump2version = "^1.0"
+cogapp = "^3.3"
 flake8 = "^6.0"
 flake8-annotations = "^3.0"
 flake8-bugbear = "^23.1"
@@ -44,7 +59,7 @@ line-length = 100
 
 [tool.isort]
 case_sensitive = true
-known_first_party = "dropmate-py,tests"
+known_first_party = "dropmate_py,tests"
 no_lines_before = "LOCALFOLDER"
 order_by_type = false
 profile = "black"
