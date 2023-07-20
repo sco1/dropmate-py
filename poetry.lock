@@ -622,20 +622,6 @@ tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
 testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
 
 [[package]]
-name = "pytest-check"
-version = "2.2.0"
-description = "A pytest plugin that allows multiple failures per test."
-optional = false
-python-versions = ">3.7"
-files = [
-    {file = "pytest_check-2.2.0-py3-none-any.whl", hash = "sha256:9769c9a13889d1f3298ee6b0ff0b84b59c8af4d927f7d52d070513601b9979c2"},
-    {file = "pytest_check-2.2.0.tar.gz", hash = "sha256:ec93701d930de5a628957cd54fe918e324da1b811040e64cb70cae2857cf26ff"},
-]
-
-[package.dependencies]
-pytest = "*"
-
-[[package]]
 name = "pytest-cov"
 version = "4.1.0"
 description = "Pytest plugin for measuring coverage."
@@ -843,13 +829,13 @@ files = [
 
 [[package]]
 name = "virtualenv"
-version = "20.24.0"
+version = "20.24.1"
 description = "Virtual Python Environment builder"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "virtualenv-20.24.0-py3-none-any.whl", hash = "sha256:18d1b37fc75cc2670625702d76849a91ebd383768b4e91382a8d51be3246049e"},
-    {file = "virtualenv-20.24.0.tar.gz", hash = "sha256:e2a7cef9da880d693b933db7654367754f14e20650dc60e8ee7385571f8593a3"},
+    {file = "virtualenv-20.24.1-py3-none-any.whl", hash = "sha256:01aacf8decd346cf9a865ae85c0cdc7f64c8caa07ff0d8b1dfc1733d10677442"},
+    {file = "virtualenv-20.24.1.tar.gz", hash = "sha256:2ef6a237c31629da6442b0bcaa3999748108c7166318d1f55cc9f8d7294e97bd"},
 ]
 
 [package.dependencies]
@@ -864,4 +850,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "4b2ac8471c534dc6148f9ea0696b5013c8f373a46053ef1acdcd747f99e73ea3"
+content-hash = "659ae1fe23148cf6256d101e720508c3b572c5771abdd05534825c92b72c6cfc"

@@ -7,6 +7,7 @@ from sco1_misc.prompts import prompt_for_dir, prompt_for_file
 
 MIN_ALT_LOSS = 200
 MIN_FIRMWARE = 5
+MIN_TIME_DELTA_MINUTES = 60
 
 load_dotenv()
 start_dir = os.environ.get("PROMPT_START_DIR", ".")
@@ -20,6 +21,7 @@ def audit(
     log_filepath: Path = typer.Option(exists=True, file_okay=True, dir_okay=False),
     min_alt_loss: int = typer.Option(default=MIN_ALT_LOSS),
     min_firmware: float = typer.Option(default=MIN_FIRMWARE),
+    time_delta_minutes: int = typer.Option(default=MIN_TIME_DELTA_MINUTES),
 ) -> None:
     """Audit a consolidated Dropmate log."""
     if log_filepath is None:
@@ -41,6 +43,7 @@ def audit_bulk(
     log_pattern: str = typer.Option("*.csv"),
     min_alt_loss: int = typer.Option(default=MIN_ALT_LOSS),
     min_firmware: float = typer.Option(default=MIN_FIRMWARE),
+    time_delta_minutes: int = typer.Option(default=MIN_TIME_DELTA_MINUTES),
 ) -> None:
     """Audit a directory of consolidated Dropmate logs."""
     if log_dir is None:

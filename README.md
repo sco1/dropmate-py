@@ -28,8 +28,8 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  audit
-  audit-bulk
+  audit       Audit a consolidated Dropmate log.
+  audit-bulk  Audit a directory of consolidated Dropmate logs.
 ```
 <!-- [[[end]]] -->
 
@@ -44,21 +44,23 @@ The following environment variables are provided to help customize pipeline beha
 ### `dropmate audit`
 Process a consolidated Dropmate log CSV.
 #### Input Parameters
-| Parameter        | Description                        | Type         | Default    |
-|------------------|------------------------------------|--------------|------------|
-| `--log-filepath` | Path to Dropmate log CSV to parse. | `Path\|None` | GUI Prompt |
-| `--min-alt-loss` | Threshold altitude delta.          | `int`        | `200`      |
-| `--min-firmware` | Threshold firmware version.        | `int\|float` | `5`        |
+| Parameter              | Description                                   | Type         | Default    |
+|------------------------|-----------------------------------------------|--------------|------------|
+| `--log-filepath`       | Path to Dropmate log CSV to parse.            | `Path\|None` | GUI Prompt |
+| `--min-alt-loss`       | Threshold altitude delta.                     | `int`        | `200`      |
+| `--min-firmware`       | Threshold firmware version.                   | `int\|float` | `5`        |
+| `--time-delta-minutes` | Dropmate internal clock delta from real-time. | `int`        | `60`       |
 
 ### `dropmate audit-bulk`
 Batch process a directory of consolidated Dropmate log CSVs.
 #### Input Parameters
-| Parameter        | Description                                   | Type         | Default    |
-|------------------|-----------------------------------------------|--------------|------------|
-| `--log-dir`      | Path to Dropmate log directory to parse.      | `Path\|None` | GUI Prompt |
-| `--log-pattern`  | Dropmate log file glob pattern.<sup>1,2</sup> | `str`        | `"*.csv"`  |
-| `--min-alt-loss` | Threshold altitude delta.                     | `int`        | `200`      |
-| `--min-firmware` | Threshold firmware version.                   | `int\|float` | `5`        |
+| Parameter              | Description                                   | Type         | Default    |
+|------------------------|-----------------------------------------------|--------------|------------|
+| `--log-dir`            | Path to Dropmate log directory to parse.      | `Path\|None` | GUI Prompt |
+| `--log-pattern`        | Dropmate log file glob pattern.<sup>1,2</sup> | `str`        | `"*.csv"`  |
+| `--min-alt-loss`       | Threshold altitude delta.                     | `int`        | `200`      |
+| `--min-firmware`       | Threshold firmware version.                   | `int\|float` | `5`        |
+| `--time-delta-minutes` | Dropmate internal clock delta from real-time. | `int`        | `60`       |
 
 1. Case sensitivity is deferred to the host OS
 2. Recursive globbing requires manual specification (e.g. `**/*.csv`)
