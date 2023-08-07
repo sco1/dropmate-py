@@ -73,7 +73,11 @@ class Health(str, Enum):  # noqa: D101
 
 @dataclass
 class FauxSeries:
-    """Helper container to support column access by name of a raw log line."""
+    """
+    Helper container to support column access by name of a raw log line.
+
+    NOTE: `raw_columns` is assumed to already be split.
+    """
 
     raw_columns: abc.Sequence[str]
     indices: ColumnIndices
@@ -84,7 +88,8 @@ class FauxSeries:
             raise KeyError(f"Column {key} not present in log file.")
 
         val = self.raw_columns[idx]
-        if not isinstance(val, str):
+        if not isinstance(val, str):  # pragma: no cover
+            # Shouldn't ever get here but add the guard just in case
             raise ValueError("Provided log data contains non-string value(s).")
 
         return val
@@ -112,7 +117,9 @@ class DropRecord:
 
     def __eq__(self, other: t.Any) -> bool:
         if not isinstance(other, DropRecord):
-            return NotImplemented
+            raise NotImplementedError(
+                f"Can only compare between {type(self).__name__}, received: {type(other).__name__}"
+            )
 
         return (self.uid == other.uid) and (self.start_time_utc == other.start_time_utc)
 
@@ -149,10 +156,10 @@ class Dropmate:  # noqa: D101
     firmware_version: float
     last_scanned_time_utc: dt.datetime
 
-    def __len__(self) -> int:
+    def __len__(self) -> int:  # pragma: no cover
         return len(self.drops)
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # pragma: no cover
         scanned_pretty = self.last_scanned_time_utc.strftime(r"%Y-%m-%d %H:%M")
         return f"UID: {self.uid}, FW: {self.firmware_version}, {len(self.drops)} drops, Scanned: {scanned_pretty} UTC"  # noqa: E501
 
@@ -175,13 +182,24 @@ def _group_by_uid(drop_logs: list[DropRecord]) -> list[Dropmate]:
     return dropmates
 
 
-def parse_raw_log(log_filepath: Path) -> list[Dropmate]:
-    """Parse the provided compiled Dropmate log CSV into a list of drops, grouped by device."""
-    full_log = log_filepath.read_text().splitlines()
-    indices = ColumnIndices.from_header(full_log[0])
+def _parse_raw_log(log_lines: abc.Sequence[str]) -> list[DropRecord]:
+    """
+    Parse the provided compiled Dropmate log lines into a list of drop records.
+
+    NOTE: The provided `log_lines` is assumed to include the header line.
+    """
+    indices = ColumnIndices.from_header(log_lines[0])
 
     drop_logs = []
-    for line in full_log[1:]:
+    for line in log_lines[1:]:
         drop_logs.append(DropRecord.from_raw(line, indices))
 
-    return _group_by_uid(drop_logs)
+    return drop_logs
+
+
+def log_parse_pipeline(log_filepath: Path) -> list[Dropmate]:
+    """Parse the provided compiled Dropmate log CSV into a list of drops, grouped by device."""
+    log_lines = log_filepath.read_text().splitlines()
+    parsed_records = _parse_raw_log(log_lines)
+
+    return _group_by_uid(parsed_records)
