@@ -14,6 +14,7 @@ DROP_RECORD_P = partial(
     battery=parser.Health.GOOD,
     device_health=parser.Health.GOOD,
     firmware_version=5.1,
+    flight_index=1,
     end_time_utc=dt.datetime(
         year=2023, month=4, day=20, hour=11, minute=30, second=0, tzinfo=dt.timezone.utc
     ),

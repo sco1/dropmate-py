@@ -1,8 +1,13 @@
 # Dropmate-py
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://github.com/pre-commit/pre-commit)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dropmate-py/0.1.0?logo=python&logoColor=FFD43B)](https://pypi.org/project/dropmate-py/)
+[![PyPI](https://img.shields.io/pypi/v/dropmate-py?logo=Python&logoColor=FFD43B)](https://pypi.org/project/dropmate-py/)
+[![PyPI - License](https://img.shields.io/pypi/l/dropmate-py?color=magenta)](https://github.com/sco1/dropmate-py/blob/main/LICENSE)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/sco1/dropmate-py/main.svg)](https://results.pre-commit.ci/latest/github/sco1/dropmate-py/main)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black)
 
 Python helpers for the [EDC Dropmate](https://earthlydynamics.com/dropmate/).
+
+🚨 This is an beta project. User-facing functionality is still under development 🚨
 
 ## Installation
 Install by cloning this repository and installing into a virtual environment:
@@ -34,6 +39,7 @@ Commands:
 <!-- [[[end]]] -->
 
 ## Usage
+**NOTE:** All functionality assumes that log records have been provided by Dropmate app version 1.5.16 or newer. Prior versions may not contain all the necessary data columns to conduct the data audit, and there may also be column naming discrepancies between the iOS and Android apps.
 ### Environment Variables
 The following environment variables are provided to help customize pipeline behaviors.
 
@@ -47,7 +53,7 @@ Process a consolidated Dropmate log CSV.
 | Parameter              | Description                                   | Type         | Default    |
 |------------------------|-----------------------------------------------|--------------|------------|
 | `--log-filepath`       | Path to Dropmate log CSV to parse.            | `Path\|None` | GUI Prompt |
-| `--min-alt-loss`       | Threshold altitude delta.                     | `int`        | `200`      |
+| `--min-alt-loss-ft`       | Threshold altitude delta, feet.            | `int`        | `200`      |
 | `--min-firmware`       | Threshold firmware version.                   | `int\|float` | `5`        |
 | `--time-delta-minutes` | Dropmate internal clock delta from real-time. | `int`        | `60`       |
 
@@ -58,7 +64,7 @@ Batch process a directory of consolidated Dropmate log CSVs.
 |------------------------|-----------------------------------------------|--------------|------------|
 | `--log-dir`            | Path to Dropmate log directory to parse.      | `Path\|None` | GUI Prompt |
 | `--log-pattern`        | Dropmate log file glob pattern.<sup>1,2</sup> | `str`        | `"*.csv"`  |
-| `--min-alt-loss`       | Threshold altitude delta.                     | `int`        | `200`      |
+| `--min-alt-loss-ft`       | Threshold altitude delta, feet.            | `int`        | `200`      |
 | `--min-firmware`       | Threshold firmware version.                   | `int\|float` | `5`        |
 | `--time-delta-minutes` | Dropmate internal clock delta from real-time. | `int`        | `60`       |
 

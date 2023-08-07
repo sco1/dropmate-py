@@ -108,6 +108,7 @@ class DropRecord:
     battery: Health
     device_health: Health
     firmware_version: float
+    flight_index: int
     start_time_utc: dt.datetime
     end_time_utc: dt.datetime
     start_barometric_altitude_msl_ft: int
@@ -140,6 +141,7 @@ class DropRecord:
             battery=Health(df["battery"].lower()),
             device_health=Health(df["device_health"].lower()),
             firmware_version=float(df["firmware_version"]),
+            flight_index=int(df["flight_index"]),
             start_time_utc=dt.datetime.fromisoformat(df["start_time_utc"]),
             end_time_utc=dt.datetime.fromisoformat(df["end_time_utc"]),
             start_barometric_altitude_msl_ft=int(df["start_barometric_altitude_msl_ft"]),
@@ -154,6 +156,7 @@ class Dropmate:  # noqa: D101
     uid: str
     drops: list[DropRecord]
     firmware_version: float
+    dropmate_internal_time_utc: dt.datetime
     last_scanned_time_utc: dt.datetime
 
     def __len__(self) -> int:  # pragma: no cover
@@ -175,6 +178,7 @@ def _group_by_uid(drop_logs: list[DropRecord]) -> list[Dropmate]:
                 # It should be a safe assumption that these values are consistent across logs from
                 # the same device
                 firmware_version=logs[0].firmware_version,
+                dropmate_internal_time_utc=logs[0].dropmate_internal_time_utc,
                 last_scanned_time_utc=logs[0].last_scanned_time_utc,
             )
         )

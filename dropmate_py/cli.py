@@ -1,11 +1,15 @@
 import os
 from pathlib import Path
 
+import click
 import typer
 from dotenv import load_dotenv
 from sco1_misc.prompts import prompt_for_dir, prompt_for_file
 
-MIN_ALT_LOSS = 200
+from dropmate_py.audits import audit_pipeline
+from dropmate_py.parser import log_parse_pipeline
+
+MIN_ALT_LOSS = 200  # feet
 MIN_FIRMWARE = 5
 MIN_TIME_DELTA_MINUTES = 60
 
@@ -18,40 +22,75 @@ dropmate_cli = typer.Typer(add_completion=False)
 
 @dropmate_cli.command()
 def audit(
-    log_filepath: Path = typer.Option(exists=True, file_okay=True, dir_okay=False),
-    min_alt_loss: int = typer.Option(default=MIN_ALT_LOSS),
+    log_filepath: Path = typer.Option(None, exists=True, file_okay=True, dir_okay=False),
+    min_alt_loss_ft: int = typer.Option(default=MIN_ALT_LOSS),
     min_firmware: float = typer.Option(default=MIN_FIRMWARE),
     time_delta_minutes: int = typer.Option(default=MIN_TIME_DELTA_MINUTES),
 ) -> None:
     """Audit a consolidated Dropmate log."""
     if log_filepath is None:
-        log_filepath = prompt_for_file(
-            title="Select Flight Log",
-            start_dir=PROMPT_START_DIR,
-            filetypes=[
-                ("Compiled Dropmate Logs", "*.csv"),
-                ("All Files", "*.*"),
-            ],
-        )
+        try:
+            log_filepath = prompt_for_file(
+                title="Select Flight Log",
+                start_dir=PROMPT_START_DIR,
+                filetypes=[
+                    ("Compiled Dropmate Logs", ("*.csv", ".txt")),
+                    ("All Files", "*.*"),
+                ],
+            )
+        except ValueError:
+            raise click.ClickException("No file selected for processing, aborting.")
 
-    raise NotImplementedError
+    conslidated_log = log_parse_pipeline(log_filepath)
+    found_errs = audit_pipeline(
+        consolidated_log=conslidated_log,
+        min_alt_loss_ft=min_alt_loss_ft,
+        min_firmware=min_firmware,
+        max_scanned_time_delta_sec=time_delta_minutes * 60,
+    )
+
+    print(f"Found {len(found_errs)} errors.")
+    if found_errs:
+        for err in found_errs:
+            print(err)
 
 
 @dropmate_cli.command()
 def audit_bulk(
-    log_dir: Path = typer.Option(exists=True, file_okay=False, dir_okay=True),
+    log_dir: Path = typer.Option(None, exists=True, file_okay=False, dir_okay=True),
     log_pattern: str = typer.Option("*.csv"),
-    min_alt_loss: int = typer.Option(default=MIN_ALT_LOSS),
+    min_alt_loss_ft: int = typer.Option(default=MIN_ALT_LOSS),
     min_firmware: float = typer.Option(default=MIN_FIRMWARE),
     time_delta_minutes: int = typer.Option(default=MIN_TIME_DELTA_MINUTES),
 ) -> None:
     """Audit a directory of consolidated Dropmate logs."""
     if log_dir is None:
-        log_dir = prompt_for_dir(
-            title="Select directory for batch processing", start_dir=PROMPT_START_DIR
+        try:
+            log_dir = prompt_for_dir(
+                title="Select directory for batch processing", start_dir=PROMPT_START_DIR
+            )
+        except ValueError:
+            raise click.ClickException("No directory selected for processing, aborting.")
+
+    log_files = list(log_dir.glob(log_pattern))
+    print(f"Found {len(log_files)} log files to process.")
+
+    found_errs = []
+    for log_filepath in log_files:
+        conslidated_log = log_parse_pipeline(log_filepath)
+        found_errs.extend(
+            audit_pipeline(
+                consolidated_log=conslidated_log,
+                min_alt_loss_ft=min_alt_loss_ft,
+                min_firmware=min_firmware,
+                max_scanned_time_delta_sec=time_delta_minutes * 60,
+            )
         )
 
-    raise NotImplementedError
+    print(f"Found {len(found_errs)} errors.")
+    if found_errs:
+        for err in found_errs:
+            print(err)
 
 
 if __name__ == "__main__":
