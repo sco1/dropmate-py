@@ -75,6 +75,7 @@ def test_drop_log_equality(
     left: parser.DropRecord, right: parser.DropRecord, truth_eq: bool
 ) -> None:
     assert (left == right) == truth_eq
+    assert (hash(left) == hash(right)) == truth_eq
 
 
 def test_drop_log_equality_non_droplog_raises() -> None:
@@ -129,7 +130,7 @@ SAMPLE_CONSOLIDATED_LOG_UNSORTED = dedent(
 )
 
 
-def test_group_by_uid() -> None:
+def test_unsorted_group_by_uid() -> None:
     log_lines = SAMPLE_CONSOLIDATED_LOG_UNSORTED.splitlines()
     parsed_records = parser._parse_raw_log(log_lines)
 

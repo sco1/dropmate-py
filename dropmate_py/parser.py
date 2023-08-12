@@ -172,8 +172,10 @@ class Dropmate:  # noqa: D101
 
 
 def _group_by_uid(drop_logs: abc.Sequence[DropRecord]) -> list[Dropmate]:
+    # Groupby assumes logs are sorted, so we need to sort them to avoid duplicate devices
+    sorted_logs = sorted(drop_logs, key=operator.attrgetter("uid", "flight_index"))
     dropmates = []
-    for uid, logs_g in itertools.groupby(drop_logs, key=operator.attrgetter("uid")):
+    for uid, logs_g in itertools.groupby(sorted_logs, key=operator.attrgetter("uid")):
         logs = list(logs_g)
         dropmates.append(
             Dropmate(
