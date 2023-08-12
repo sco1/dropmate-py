@@ -100,7 +100,8 @@ class DropRecord:
     """
     Represent a Dropmate drop record.
 
-    Drop records compare equal using both the Dropmate UID and the log's UTC start time.
+    Drop records compare equal using both the Dropmate UID and the record's flight index, as
+    determined by the Dropmate hardware.
     """
 
     serial_number: str
@@ -122,7 +123,10 @@ class DropRecord:
                 f"Can only compare between {type(self).__name__}, received: {type(other).__name__}"
             )
 
-        return (self.uid == other.uid) and (self.start_time_utc == other.start_time_utc)
+        return (self.uid, self.flight_index) == (other.uid, other.flight_index)
+
+    def __hash__(self) -> int:
+        return hash((self.uid, self.flight_index))
 
     @classmethod
     def from_raw(cls, log_line: str, indices: ColumnIndices) -> DropRecord:
@@ -167,7 +171,7 @@ class Dropmate:  # noqa: D101
         return f"UID: {self.uid}, FW: {self.firmware_version}, {len(self.drops)} drops, Scanned: {scanned_pretty} UTC"  # noqa: E501
 
 
-def _group_by_uid(drop_logs: list[DropRecord]) -> list[Dropmate]:
+def _group_by_uid(drop_logs: abc.Sequence[DropRecord]) -> list[Dropmate]:
     dropmates = []
     for uid, logs_g in itertools.groupby(drop_logs, key=operator.attrgetter("uid")):
         logs = list(logs_g)
