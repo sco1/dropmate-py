@@ -145,3 +145,15 @@ def test_file_parse_pipeline(tmp_path: Path) -> None:
     grouped_records = parser.log_parse_pipeline(log_file)
     assert len(grouped_records) == 3
     assert [rec.uid for rec in grouped_records] == ["A1", "A2", "A3"]
+
+
+def test_merge_dropomates() -> None:
+    faux_batch_dropmates = parser._group_by_uid(
+        parser._parse_raw_log(SAMPLE_CONSOLIDATED_LOG.splitlines())
+    )
+    faux_batch_dropmates.extend(
+        parser._group_by_uid(parser._parse_raw_log(SAMPLE_CONSOLIDATED_LOG.splitlines()))
+    )
+
+    merged = parser.merge_dropmates(faux_batch_dropmates)
+    assert len(merged) == 3

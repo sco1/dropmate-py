@@ -171,7 +171,7 @@ class Dropmate:  # noqa: D101
         return f"UID: {self.uid}, FW: {self.firmware_version}, {len(self.drops)} drops, Scanned: {scanned_pretty} UTC"  # noqa: E501
 
 
-def _group_by_uid(drop_logs: abc.Sequence[DropRecord]) -> list[Dropmate]:
+def _group_by_uid(drop_logs: abc.Collection[DropRecord]) -> list[Dropmate]:
     # Groupby assumes logs are sorted, so we need to sort them to avoid duplicate devices
     sorted_logs = sorted(drop_logs, key=operator.attrgetter("uid", "flight_index"))
     dropmates = []
@@ -213,3 +213,12 @@ def log_parse_pipeline(log_filepath: Path) -> list[Dropmate]:
     parsed_records = _parse_raw_log(log_lines)
 
     return _group_by_uid(parsed_records)
+
+
+def merge_dropmates(dropmates: abc.Sequence[Dropmate]) -> list[Dropmate]:
+    """Merge a collection of potentially overlapping `Dropmate` devices into a new list."""
+    all_drops = set()
+    for dropmate in dropmates:
+        all_drops.update(dropmate.drops)
+
+    return _group_by_uid(all_drops)

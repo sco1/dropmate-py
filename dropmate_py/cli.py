@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from sco1_misc.prompts import prompt_for_dir, prompt_for_file
 
 from dropmate_py.audits import audit_pipeline
-from dropmate_py.parser import log_parse_pipeline
+from dropmate_py.parser import log_parse_pipeline, merge_dropmates
 
 MIN_ALT_LOSS = 200  # feet
 MIN_FIRMWARE = 5
@@ -75,17 +75,17 @@ def audit_bulk(
     log_files = list(log_dir.glob(log_pattern))
     print(f"Found {len(log_files)} log files to process.")
 
-    found_errs = []
-    for log_filepath in log_files:
-        conslidated_log = log_parse_pipeline(log_filepath)
-        found_errs.extend(
-            audit_pipeline(
-                consolidated_log=conslidated_log,
-                min_alt_loss_ft=min_alt_loss_ft,
-                min_firmware=min_firmware,
-                max_scanned_time_delta_sec=time_delta_minutes * 60,
-            )
-        )
+    compiled_logs = log_parse_pipeline(log_files[0])
+    for log_filepath in log_files[1:]:
+        compiled_logs.extend(log_parse_pipeline(log_filepath))
+
+    compiled_logs = merge_dropmates(compiled_logs)
+    found_errs = audit_pipeline(
+        consolidated_log=compiled_logs,
+        min_alt_loss_ft=min_alt_loss_ft,
+        min_firmware=min_firmware,
+        max_scanned_time_delta_sec=time_delta_minutes * 60,
+    )
 
     print(f"Found {len(found_errs)} errors.")
     if found_errs:
