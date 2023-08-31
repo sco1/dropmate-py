@@ -9,8 +9,16 @@ def _audit_drops(dropmate: Dropmate, min_alt_loss_ft: int) -> list[str]:
 
     if len(dropmate.drops) == 0:
         found_issues.append(f"UID {dropmate.uid} contains no drop records.")
+        return found_issues
 
     for drop_record in dropmate.drops:
+        # Type guard, we should have already returned early before we get to an empty drop record
+        if (
+            drop_record.start_barometric_altitude_msl_ft is None
+            or drop_record.end_barometric_altitude_msl_ft is None
+        ):
+            continue  # pragma: no cover
+
         altitude_loss = (
             drop_record.start_barometric_altitude_msl_ft
             - drop_record.end_barometric_altitude_msl_ft

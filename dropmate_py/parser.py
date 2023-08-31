@@ -95,6 +95,17 @@ class FauxSeries:
         return val
 
 
+T = t.TypeVar("T")
+
+
+def _try_conv(in_val: str, converter: abc.Callable[[str], T]) -> T | None:
+    """Attempt the specified conversion if `in_val` is not `"na"`, otherwise return `None`."""
+    if in_val == "na":
+        return None
+
+    return converter(in_val)
+
+
 @dataclass
 class DropRecord:
     """
@@ -102,6 +113,14 @@ class DropRecord:
 
     Drop records compare equal using both the Dropmate UID and the record's flight index, as
     determined by the Dropmate hardware.
+
+    NOTE: A Dropmate with no drops currently scan with the following columns set to `"na"`, and will
+    be set to `None`:
+        * `flight_index`
+        * `start_time_utc`
+        * `end_time_utc`
+        * `start_barometric_altitude_msl_ft`
+        * `end_barometric_altitude_msl_ft`
     """
 
     serial_number: str
@@ -109,11 +128,11 @@ class DropRecord:
     battery: Health
     device_health: Health
     firmware_version: float
-    flight_index: int
-    start_time_utc: dt.datetime
-    end_time_utc: dt.datetime
-    start_barometric_altitude_msl_ft: int
-    end_barometric_altitude_msl_ft: int
+    flight_index: int | None
+    start_time_utc: dt.datetime | None
+    end_time_utc: dt.datetime | None
+    start_barometric_altitude_msl_ft: int | None
+    end_barometric_altitude_msl_ft: int | None
     dropmate_internal_time_utc: dt.datetime
     last_scanned_time_utc: dt.datetime
 
@@ -145,11 +164,11 @@ class DropRecord:
             battery=Health(df["battery"].lower()),
             device_health=Health(df["device_health"].lower()),
             firmware_version=float(df["firmware_version"]),
-            flight_index=int(df["flight_index"]),
-            start_time_utc=dt.datetime.fromisoformat(df["start_time_utc"]),
-            end_time_utc=dt.datetime.fromisoformat(df["end_time_utc"]),
-            start_barometric_altitude_msl_ft=int(df["start_barometric_altitude_msl_ft"]),
-            end_barometric_altitude_msl_ft=int(df["end_barometric_altitude_msl_ft"]),
+            flight_index=_try_conv(df["flight_index"], int),
+            start_time_utc=_try_conv(df["start_time_utc"], dt.datetime.fromisoformat),
+            end_time_utc=_try_conv(df["end_time_utc"], dt.datetime.fromisoformat),
+            start_barometric_altitude_msl_ft=_try_conv(df["start_barometric_altitude_msl_ft"], int),
+            end_barometric_altitude_msl_ft=_try_conv(df["end_barometric_altitude_msl_ft"], int),
             dropmate_internal_time_utc=dt.datetime.fromisoformat(df["dropmate_internal_time_utc"]),
             last_scanned_time_utc=dt.datetime.fromisoformat(df["last_scanned_time_utc"]),
         )
@@ -162,6 +181,12 @@ class Dropmate:  # noqa: D101
     firmware_version: float
     dropmate_internal_time_utc: dt.datetime
     last_scanned_time_utc: dt.datetime
+
+    def __post_init__(self) -> None:
+        # Empty out drops if we have an empty log record
+        # An empty Dropmate should only have one record in it
+        if self.drops and self.drops[0].flight_index is None:
+            self.drops = []
 
     def __len__(self) -> int:  # pragma: no cover
         return len(self.drops)

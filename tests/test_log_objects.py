@@ -157,3 +157,32 @@ def test_merge_dropomates() -> None:
 
     merged = parser.merge_dropmates(faux_batch_dropmates)
     assert len(merged) == 3
+
+
+SAMPLE_EMPTY_RECORD = "0,e123456067a65241,good,good,5.1,on,on,0,0,0,na,na,na,na,na,2023-04-20T13:02:41Z,2023-04-20T17:49:09Z,iPhone 14 Pro Max,16.6,1.4"
+EMPTY_LOG_NONE_COLS = {
+    "flight_index",
+    "start_time_utc",
+    "end_time_utc",
+    "start_barometric_altitude_msl_ft",
+    "end_barometric_altitude_msl_ft",
+}
+
+
+def test_empty_log_record_has_none() -> None:
+    log = parser.DropRecord.from_raw(SAMPLE_EMPTY_RECORD, SAMPLE_FULL_HEADER_COL_IDX)
+    for col in EMPTY_LOG_NONE_COLS:
+        assert getattr(log, col) is None
+
+
+def test_empty_dropmate_zero_len() -> None:
+    log = parser.DropRecord.from_raw(SAMPLE_EMPTY_RECORD, SAMPLE_FULL_HEADER_COL_IDX)
+    dm = parser.Dropmate(
+        uid="abc123",
+        drops=[log],
+        firmware_version=1,
+        dropmate_internal_time_utc=dt.datetime.utcnow(),
+        last_scanned_time_utc=dt.datetime.utcnow(),
+    )
+
+    assert len(dm) == 0
