@@ -40,6 +40,19 @@ Commands:
 
 ## Usage
 **NOTE:** All functionality assumes that log records have been provided by Dropmate app version 1.5.16 or newer. Prior versions may not contain all the necessary data columns to conduct the data audit, and there may also be column naming discrepancies between the iOS and Android apps.
+
+### Supported Audits
+The following audits are supported:
+
+* Empty Drop Record
+* Minimum Altitude Loss
+* Minimum Time Between Drop Records
+  * Time delta between the end of the previous drop record and the beginning of the next.
+  * Short deltas may indicate that the previous drop record ended prematurely & restarted mid-air
+* Minimum Dropmate Firmware Version
+* Dropmate Internal Clock Drift
+  * Measured as the delta between the scanning device's clock at scan time and the Dropmate's internal clock
+
 ### Environment Variables
 The following environment variables are provided to help customize pipeline behaviors.
 
