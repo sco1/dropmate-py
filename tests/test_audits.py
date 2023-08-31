@@ -5,17 +5,15 @@ import pytest
 
 from dropmate_py import audits, parser
 
+DATE_P = partial(dt.datetime, year=2023, month=4, day=20, second=0, tzinfo=dt.timezone.utc)
+
 DROPMATE_P = partial(
     parser.Dropmate,
     uid="ABC123",
     drops=[],
     firmware_version=5.1,
-    dropmate_internal_time_utc=dt.datetime(
-        year=2023, month=4, day=20, hour=12, minute=30, second=0, tzinfo=dt.timezone.utc
-    ),
-    last_scanned_time_utc=dt.datetime(
-        year=2023, month=4, day=20, hour=12, minute=30, second=0, tzinfo=dt.timezone.utc
-    ),
+    dropmate_internal_time_utc=DATE_P(hour=12, minute=30),
+    last_scanned_time_utc=DATE_P(hour=12, minute=30),
 )
 
 
@@ -27,20 +25,12 @@ DROP_RECORD_P = partial(
     device_health=parser.Health.GOOD,
     firmware_version=5.1,
     flight_index=1,
-    start_time_utc=dt.datetime(
-        year=2023, month=4, day=20, hour=11, minute=00, second=0, tzinfo=dt.timezone.utc
-    ),
-    end_time_utc=dt.datetime(
-        year=2023, month=4, day=20, hour=11, minute=30, second=0, tzinfo=dt.timezone.utc
-    ),
+    start_time_utc=DATE_P(hour=11, minute=00),
+    end_time_utc=DATE_P(hour=11, minute=30),
     start_barometric_altitude_msl_ft=1000,
     end_barometric_altitude_msl_ft=0,
-    dropmate_internal_time_utc=dt.datetime(
-        year=2023, month=4, day=20, hour=12, minute=30, second=0, tzinfo=dt.timezone.utc
-    ),
-    last_scanned_time_utc=dt.datetime(
-        year=2023, month=4, day=20, hour=12, minute=30, second=0, tzinfo=dt.timezone.utc
-    ),
+    dropmate_internal_time_utc=DATE_P(hour=12, minute=30),
+    last_scanned_time_utc=DATE_P(hour=12, minute=30),
 )
 
 DROP_RECORD_AUDIT_CASES = (
@@ -95,12 +85,30 @@ DROP_RECORD_AUDIT_CASES = (
         ),
         1,
     ),
+    (
+        DROPMATE_P(
+            drops=[
+                DROP_RECORD_P(
+                    start_barometric_altitude_msl_ft=1000, end_barometric_altitude_msl_ft=0
+                ),
+                DROP_RECORD_P(
+                    flight_index=2,
+                    start_barometric_altitude_msl_ft=1000,
+                    end_barometric_altitude_msl_ft=0,
+                    start_time_utc=DATE_P(hour=11, minute=31),
+                ),
+            ]
+        ),
+        1,
+    ),
 )
 
 
 @pytest.mark.parametrize(("dropmate", "n_expected_errors"), DROP_RECORD_AUDIT_CASES)
 def test_audit_drops(dropmate: parser.Dropmate, n_expected_errors: int) -> None:
-    reported_errors = audits._audit_drops(dropmate=dropmate, min_alt_loss_ft=200)
+    reported_errors = audits._audit_drops(
+        dropmate=dropmate, min_alt_loss_ft=200, min_delta_to_next_sec=600
+    )
     assert len(reported_errors) == n_expected_errors
 
 
@@ -109,24 +117,16 @@ DROPMATE_AUDIT_CASES = (
     (DROPMATE_P(firmware_version=1.0), 1),
     (
         DROPMATE_P(
-            dropmate_internal_time_utc=dt.datetime(
-                year=2023, month=4, day=20, hour=14, minute=30, second=0, tzinfo=dt.timezone.utc
-            ),
-            last_scanned_time_utc=dt.datetime(
-                year=2023, month=4, day=20, hour=12, minute=30, second=0, tzinfo=dt.timezone.utc
-            ),
+            dropmate_internal_time_utc=DATE_P(hour=14, minute=30),
+            last_scanned_time_utc=DATE_P(hour=12, minute=30),
         ),
         1,
     ),
     (
         DROPMATE_P(
             firmware_version=1.0,
-            dropmate_internal_time_utc=dt.datetime(
-                year=2023, month=4, day=20, hour=14, minute=30, second=0, tzinfo=dt.timezone.utc
-            ),
-            last_scanned_time_utc=dt.datetime(
-                year=2023, month=4, day=20, hour=12, minute=30, second=0, tzinfo=dt.timezone.utc
-            ),
+            dropmate_internal_time_utc=DATE_P(hour=14, minute=30),
+            last_scanned_time_utc=DATE_P(hour=12, minute=30),
         ),
         2,
     ),
@@ -165,5 +165,6 @@ def test_audit_pipeline() -> None:
         min_alt_loss_ft=200,
         min_firmware=5.1,
         max_scanned_time_delta_sec=3600,
+        min_delta_to_next_sec=600,
     )
     assert len(reported_errors) == 2

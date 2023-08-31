@@ -3,36 +3,59 @@ from collections import abc
 from dropmate_py.parser import Dropmate
 
 
-def _audit_drops(dropmate: Dropmate, min_alt_loss_ft: int) -> list[str]:
-    """Audit for missing drop records and for issues with total altitude loss."""
+def _audit_drops(
+    dropmate: Dropmate,
+    min_alt_loss_ft: int,
+    min_delta_to_next_sec: int,
+) -> list[str]:
+    """
+    Audit the drop records for the provided Dropmate.
+
+    Dropmate is audited for the following issues:
+        * Empty drop records
+        * Altitude loss below the provided threshold
+        * For Dropmates with more than one record, check that the beginning of the drop record is
+        far enough away from the end of the previous record, which may indicate that a drop has been
+        double counted
+    """
     found_issues = []
 
     if len(dropmate.drops) == 0:
         found_issues.append(f"UID {dropmate.uid} contains no drop records.")
         return found_issues
 
-    for drop_record in dropmate.drops:
-        # Type guard, we should have already returned early before we get to an empty drop record
-        if (
-            drop_record.start_barometric_altitude_msl_ft is None
-            or drop_record.end_barometric_altitude_msl_ft is None
-        ):
-            continue  # pragma: no cover
+    # Once we've gotten here then we've already exited on an empty log so we can't have any None
+    # values in our DropRecords
 
-        altitude_loss = (
-            drop_record.start_barometric_altitude_msl_ft
-            - drop_record.end_barometric_altitude_msl_ft
-        )
+    for drop_record in dropmate.drops:
+        start = drop_record.start_barometric_altitude_msl_ft
+        end = drop_record.end_barometric_altitude_msl_ft
+        altitude_loss = start - end  # type: ignore[operator]
         if altitude_loss < min_alt_loss_ft:
             found_issues.append(
                 f"UID {dropmate.uid} drop #{drop_record.flight_index} below threshold altitude loss: {altitude_loss} feet."  # noqa: E501
+            )
+
+    # Check for log start timestamps that are in close proximity to the end of the previous log,
+    # indicating that a jump may have ended prematurely
+    # We shouldn't have enough records where performance is critical, so we can just do a new loop
+    # rather than complicating the altitude checking one
+    for prev_rec, next_rec in zip(dropmate.drops, dropmate.drops[1:]):
+        next_start = next_rec.start_time_utc
+        prev_end = prev_rec.end_time_utc
+        start_delta = (next_start - prev_end).total_seconds()  # type: ignore[operator]
+        if abs(start_delta) < min_delta_to_next_sec:
+            found_issues.append(
+                f"UID {dropmate.uid} drop #{next_rec.flight_index} start time below threshold from previous flight: {start_delta} seconds"  # noqa: E501
             )
 
     return found_issues
 
 
 def _audit_dropmate(
-    dropmate: Dropmate, min_firmware: float, max_scanned_time_delta_sec: int
+    dropmate: Dropmate,
+    min_firmware: float,
+    max_scanned_time_delta_sec: int,
 ) -> list[str]:
     """Audit for issues with firmware version and delta between internal and external clocks."""
     found_issues = []
@@ -54,6 +77,7 @@ def _audit_dropmate(
 def audit_pipeline(
     consolidated_log: abc.Iterable[Dropmate],
     min_alt_loss_ft: int,
+    min_delta_to_next_sec: int,
     min_firmware: float,
     max_scanned_time_delta_sec: int,
 ) -> list[str]:
@@ -68,6 +92,12 @@ def audit_pipeline(
                 max_scanned_time_delta_sec=max_scanned_time_delta_sec,
             )
         )
-        found_issues.extend(_audit_drops(dropmate, min_alt_loss_ft=min_alt_loss_ft))
+        found_issues.extend(
+            _audit_drops(
+                dropmate,
+                min_alt_loss_ft=min_alt_loss_ft,
+                min_delta_to_next_sec=min_delta_to_next_sec,
+            )
+        )
 
     return found_issues

@@ -12,6 +12,7 @@ from dropmate_py.parser import log_parse_pipeline, merge_dropmates
 MIN_ALT_LOSS = 200  # feet
 MIN_FIRMWARE = 5
 MIN_TIME_DELTA_MINUTES = 60
+MIN_DELTA_BETWEEN_MINUTES = 10
 
 load_dotenv()
 start_dir = os.environ.get("PROMPT_START_DIR", ".")
@@ -25,7 +26,8 @@ def audit(
     log_filepath: Path = typer.Option(None, exists=True, file_okay=True, dir_okay=False),
     min_alt_loss_ft: int = typer.Option(default=MIN_ALT_LOSS),
     min_firmware: float = typer.Option(default=MIN_FIRMWARE),
-    time_delta_minutes: int = typer.Option(default=MIN_TIME_DELTA_MINUTES),
+    internal_time_delta_minutes: int = typer.Option(default=MIN_TIME_DELTA_MINUTES),
+    time_delta_between_minutes: int = typer.Option(default=MIN_DELTA_BETWEEN_MINUTES),
 ) -> None:
     """Audit a consolidated Dropmate log."""
     if log_filepath is None:
@@ -46,7 +48,8 @@ def audit(
         consolidated_log=conslidated_log,
         min_alt_loss_ft=min_alt_loss_ft,
         min_firmware=min_firmware,
-        max_scanned_time_delta_sec=time_delta_minutes * 60,
+        max_scanned_time_delta_sec=internal_time_delta_minutes * 60,
+        min_delta_to_next_sec=time_delta_between_minutes * 60,
     )
 
     print(f"Found {len(found_errs)} errors.")
@@ -61,7 +64,8 @@ def audit_bulk(
     log_pattern: str = typer.Option("*.csv"),
     min_alt_loss_ft: int = typer.Option(default=MIN_ALT_LOSS),
     min_firmware: float = typer.Option(default=MIN_FIRMWARE),
-    time_delta_minutes: int = typer.Option(default=MIN_TIME_DELTA_MINUTES),
+    internal_time_delta_minutes: int = typer.Option(default=MIN_TIME_DELTA_MINUTES),
+    time_delta_between_minutes: int = typer.Option(default=MIN_DELTA_BETWEEN_MINUTES),
 ) -> None:
     """Audit a directory of consolidated Dropmate logs."""
     if log_dir is None:
@@ -84,7 +88,8 @@ def audit_bulk(
         consolidated_log=compiled_logs,
         min_alt_loss_ft=min_alt_loss_ft,
         min_firmware=min_firmware,
-        max_scanned_time_delta_sec=time_delta_minutes * 60,
+        max_scanned_time_delta_sec=internal_time_delta_minutes * 60,
+        min_delta_to_next_sec=time_delta_between_minutes * 60,
     )
 
     print(f"Found {len(found_errs)} errors.")
