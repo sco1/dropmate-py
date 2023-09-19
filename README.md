@@ -35,6 +35,7 @@ Options:
 Commands:
   audit       Audit a consolidated Dropmate log.
   audit-bulk  Audit a directory of consolidated Dropmate logs.
+  consolidate Merge a directory of Dropmate app outputs into a deduplicated, simplified drop record.
 ```
 <!-- [[[end]]] -->
 
@@ -85,6 +86,19 @@ Batch process a directory of consolidated Dropmate log CSVs.
 
 1. Case sensitivity is deferred to the host OS
 2. Recursive globbing requires manual specification (e.g. `**/*.csv`)
+
+### `dropmate consolidate`
+Merge a directory of Dropmate app outputs into a deduplicated, simplified drop record.
+#### Input Parameters
+| Parameter        | Description                                   | Type         | Default                             |
+|----------------- |-----------------------------------------------|--------------|-------------------------------------|
+| `--log-dir`      | Path to Dropmate log directory to parse.      | `Path\|None` | GUI Prompt                          |
+| `--log-pattern`  | Dropmate log file glob pattern.<sup>1,2</sup> | `str`        | `"dropmate_records_*"`              |
+| `--out-filename` | Consolidated log filename.<sup>3</sup>        | `str`        | `consolidated_dropmate_records.csv` |
+
+1. Case sensitivity is deferred to the host OS
+2. Recursive globbing requires manual specification (e.g. `**/dropmate_records_*`)
+3. Consolidate log will be written into the specified log directory; any existing file of the same name will be overwritten
 
 ## Contributing
 **NOTE:** Due to deployment environment restrictions preventing the use of compiled libraries (e.g. Polars, Pandas/Numpy), tooling is intentionally limited to pure-Python implementations.

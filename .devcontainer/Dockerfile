@@ -1,10 +1,10 @@
 FROM ubuntu:focal
 ARG PYTHON_PACKAGES="\
-python3.8 python3.8-distutils python3.8-venv \
-python3.9 python3.9-distutils python3.9-venv \
-python3.10 python3.10-distutils python3.10-venv \
-python3.11 python3.11-distutils python3.11-venv \
-python3.12 python3.12-distutils python3.11-venv \
+python3.8 python3.8-distutils python3.8-venv python3.8-tk \
+python3.9 python3.9-distutils python3.9-venv python3.9-tk \
+python3.10 python3.10-distutils python3.10-venv python3.10-tk \
+python3.11 python3.11-distutils python3.11-venv python3.11-tk \
+python3.12 python3.12-distutils python3.12-venv python3.12-tk \
 "
 
 # Base utils

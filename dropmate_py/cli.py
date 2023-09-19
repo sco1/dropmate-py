@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from sco1_misc.prompts import prompt_for_dir, prompt_for_file
 
 from dropmate_py.audits import audit_pipeline
+from dropmate_py.log_utils import consolidate_drop_records
 from dropmate_py.parser import log_parse_pipeline, merge_dropmates
 
 MIN_ALT_LOSS = 200  # feet
@@ -96,6 +97,32 @@ def audit_bulk(
     if found_errs:
         for err in found_errs:
             print(err)
+
+
+@dropmate_cli.command()
+def consolidate(
+    log_dir: Path = typer.Option(None, exists=True, file_okay=False, dir_okay=True),
+    log_pattern: str = typer.Option("dropmate_records_*"),
+    out_filename: str = typer.Option("consolidated_dropmate_records.csv"),
+) -> None:
+    """Merge a directory of Dropmate app outputs into a deduplicated, simplified drop record."""
+    if log_dir is None:
+        try:
+            log_dir = prompt_for_dir(
+                title="Select directory for batch processing", start_dir=PROMPT_START_DIR
+            )
+        except ValueError:
+            raise click.ClickException("No directory selected for processing, aborting.")
+
+    log_files = list(log_dir.glob(log_pattern))
+    print(f"Found {len(log_files)} log files to consolidate.")
+
+    out_filepath = log_dir / out_filename
+    consolidated_records = consolidate_drop_records(
+        log_dir=log_dir, log_pattern=log_pattern, out_filepath=out_filepath
+    )
+
+    print(f"Identified {len(consolidated_records)} unique drop records.")
 
 
 if __name__ == "__main__":
