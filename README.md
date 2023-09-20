@@ -1,13 +1,11 @@
 # Dropmate-py
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dropmate-py/0.1.0?logo=python&logoColor=FFD43B)](https://pypi.org/project/dropmate-py/)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dropmate-py/1.0.0?logo=python&logoColor=FFD43B)](https://pypi.org/project/dropmate-py/)
 [![PyPI](https://img.shields.io/pypi/v/dropmate-py?logo=Python&logoColor=FFD43B)](https://pypi.org/project/dropmate-py/)
 [![PyPI - License](https://img.shields.io/pypi/l/dropmate-py?color=magenta)](https://github.com/sco1/dropmate-py/blob/main/LICENSE)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/sco1/dropmate-py/main.svg)](https://results.pre-commit.ci/latest/github/sco1/dropmate-py/main)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-black)](https://github.com/psf/black)
 
 Python helpers for the [EDC Dropmate](https://earthlydynamics.com/dropmate/).
-
-🚨 This is an beta project. User-facing functionality is still under development 🚨
 
 ## Installation
 Install by cloning this repository and installing into a virtual environment:

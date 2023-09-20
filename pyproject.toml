@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dropmate-py"
-version = "0.1.0"
+version = "1.0.0"
 description = "Python helpers for the EDC Dropmate"
 authors = ["sco1 <sco1.git@gmail.com>"]
 
@@ -8,7 +8,7 @@ readme = "README.md"
 homepage = "https://github.com/sco1/"
 repository = "https://github.com/sco1/dropmate-py"
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
