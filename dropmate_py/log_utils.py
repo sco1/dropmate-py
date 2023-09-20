@@ -13,7 +13,7 @@ CONSOLIDATED_HEADERS = (
 )
 
 
-def _keyer(short_record: str) -> tuple[str, str]:  # pragma: no cover
+def _keyer(short_record: str) -> tuple[str, int]:  # pragma: no cover
     """
     Sorting key based on consolidated drop record.
 
@@ -21,7 +21,7 @@ def _keyer(short_record: str) -> tuple[str, str]:  # pragma: no cover
     index.
     """
     split_record = short_record.split(",")
-    return (split_record[0], split_record[1])
+    return (split_record[0], int(split_record[1]))
 
 
 def consolidate_drop_records(
@@ -29,6 +29,7 @@ def consolidate_drop_records(
     log_pattern: str,
     out_filepath: Path,
     keep_headers: abc.Sequence[str] = CONSOLIDATED_HEADERS,
+    write_file: bool = True,
 ) -> list[str]:
     """
     Merge a directory of Dropmate drop record outputs into a deduplicated, simplified drop record.
@@ -61,8 +62,9 @@ def consolidate_drop_records(
 
     consolidated_records.sort(key=_keyer)
 
-    with out_filepath.open("w") as f:
-        f.write(f"{','.join(keep_headers)}\n")
-        f.writelines(f"{record}\n" for record in consolidated_records)
+    if write_file:
+        with out_filepath.open("w") as f:
+            f.write(f"{','.join(keep_headers)}\n")
+            f.writelines(f"{record}\n" for record in consolidated_records)
 
     return consolidated_records
