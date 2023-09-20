@@ -13,7 +13,7 @@ CONSOLIDATED_HEADERS = (
 )
 
 
-def _keyer(short_record: str) -> tuple[str, str]:
+def _keyer(short_record: str) -> tuple[str, str]:  # pragma: no cover
     """
     Sorting key based on consolidated drop record.
 

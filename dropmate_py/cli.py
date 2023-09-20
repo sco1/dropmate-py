@@ -105,7 +105,7 @@ def consolidate(
     log_pattern: str = typer.Option("dropmate_records_*"),
     out_filename: str = typer.Option("consolidated_dropmate_records.csv"),
 ) -> None:
-    """Merge a directory of Dropmate app outputs into a deduplicated, simplified drop record."""
+    """Merge a directory of logs into a simplified drop record."""
     if log_dir is None:
         try:
             log_dir = prompt_for_dir(

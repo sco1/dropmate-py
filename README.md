@@ -33,9 +33,9 @@ Options:
   --help  Show this message and exit.
 
 Commands:
-  audit       Audit a consolidated Dropmate log.
-  audit-bulk  Audit a directory of consolidated Dropmate logs.
-  consolidate Merge a directory of Dropmate app outputs into a deduplicated, simplified drop record.
+  audit        Audit a consolidated Dropmate log.
+  audit-bulk   Audit a directory of consolidated Dropmate logs.
+  consolidate  Merge a directory of logs into a simplified drop record.
 ```
 <!-- [[[end]]] -->
 
