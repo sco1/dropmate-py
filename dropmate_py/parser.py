@@ -178,6 +178,8 @@ class DropRecord:
 class Dropmate:  # noqa: D101
     uid: str
     drops: list[DropRecord]
+    battery: Health
+    device_health: Health
     firmware_version: float
     dropmate_internal_time_utc: dt.datetime
     last_scanned_time_utc: dt.datetime
@@ -193,7 +195,8 @@ class Dropmate:  # noqa: D101
 
     def __str__(self) -> str:  # pragma: no cover
         scanned_pretty = self.last_scanned_time_utc.strftime(r"%Y-%m-%d %H:%M")
-        return f"UID: {self.uid}, FW: {self.firmware_version}, {len(self.drops)} drops, Scanned: {scanned_pretty} UTC"  # noqa: E501
+        health_pretty = f"(b: {self.battery.value}, d: {self.device_health.value})"
+        return f"UID: {self.uid}, Health: {health_pretty}, FW: {self.firmware_version}, {len(self.drops)} drops, Scanned: {scanned_pretty} UTC"  # noqa: E501
 
 
 def _group_by_uid(drop_logs: abc.Collection[DropRecord]) -> list[Dropmate]:
@@ -206,6 +209,9 @@ def _group_by_uid(drop_logs: abc.Collection[DropRecord]) -> list[Dropmate]:
             Dropmate(
                 uid=uid,
                 drops=logs,
+                # Health values are stored per-drop and may deteriorate over time, so take the last
+                battery=logs[-1].battery,
+                device_health=logs[-1].device_health,
                 # It should be a safe assumption that these values are consistent across logs from
                 # the same device
                 firmware_version=logs[0].firmware_version,

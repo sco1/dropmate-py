@@ -36,6 +36,16 @@ class InternalClockDeltaError(DropmateAuditErrorBase):
         return f"UID {self.device.uid} internal time delta from scanned time exceeds threshold: {self.val} seconds"
 
 
+class BatteryHealthError(DropmateAuditErrorBase):
+    def __str__(self) -> str:
+        return f"UID {self.device.uid} showing poor battery health."
+
+
+class DeviceHealthError(DropmateAuditErrorBase):
+    def __str__(self) -> str:
+        return f"UID {self.device.uid} showing poor device health."
+
+
 class DropRecordError(AuditErrorBase):
     def __init__(self, device: Dropmate, drop_record: DropRecord, val: float) -> None:
         self.device = device

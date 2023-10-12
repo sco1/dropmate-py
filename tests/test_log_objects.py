@@ -32,7 +32,7 @@ DROP_RECORD_P = partial(
 )
 
 SAMPLE_FULL_HEADER = "serial_number,uid,battery,device_health,firmware_version,log_timestamp,log_altitude,total_flights,flights_over_18kft,recorded_flights,flight_index,start_time_utc,end_time_utc,start_barometric_altitude_msl_ft,end_barometric_altitude_msl_ft,dropmate_internal_time_utc,last_scanned_time_utc,scan_device_type,scan_device_os,dropmate_app_version"
-SAMPLE_DATA_LINE = "cereal,ABC123,Good,good,5.1,true,true,3,0,3,1,2023-04-20T11:00:00Z,2023-04-20T11:30:00Z,1000,0,2023-04-20T12:30:00Z,2023-04-20T12:30:00Z,SM S901U1,31,1.5.16"
+SAMPLE_DATA_LINE = "cereal,ABC123,Good,poor,5.1,true,true,3,0,3,1,2023-04-20T11:00:00Z,2023-04-20T11:30:00Z,1000,0,2023-04-20T12:30:00Z,2023-04-20T12:30:00Z,SM S901U1,31,1.5.16"
 
 SAMPLE_FULL_HEADER_COL_IDX = parser.ColumnIndices.from_header(SAMPLE_FULL_HEADER)
 
@@ -41,6 +41,7 @@ def test_droprecord_from_raw() -> None:
     truth_log = DROP_RECORD_P(
         uid="ABC123",
         flight_index=1,
+        device_health=parser.Health.POOR,
     )
 
     log = parser.DropRecord.from_raw(SAMPLE_DATA_LINE, SAMPLE_FULL_HEADER_COL_IDX)
@@ -180,9 +181,11 @@ def test_empty_dropmate_zero_len() -> None:
     dm = parser.Dropmate(
         uid="abc123",
         drops=[log],
+        battery=parser.Health.GOOD,
+        device_health=parser.Health.GOOD,
         firmware_version=1,
-        dropmate_internal_time_utc=dt.datetime.utcnow(),
-        last_scanned_time_utc=dt.datetime.utcnow(),
+        dropmate_internal_time_utc=dt.datetime.now(dt.UTC),
+        last_scanned_time_utc=dt.datetime.now(dt.UTC),
     )
 
     assert len(dm) == 0

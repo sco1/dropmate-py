@@ -3,12 +3,14 @@ from collections import abc
 from dropmate_py.audit_errors import (
     AltitudeLossError,
     AuditErrorP,
+    BatteryHealthError,
+    DeviceHealthError,
     EmptyDropLogError,
     InternalClockDeltaError,
     OutdatedFirmwareError,
     TimeDeltaError,
 )
-from dropmate_py.parser import Dropmate
+from dropmate_py.parser import Dropmate, Health
 
 
 def _audit_drops(
@@ -25,6 +27,8 @@ def _audit_drops(
         * For Dropmates with more than one record, check that the beginning of the drop record is
         far enough away from the end of the previous record, which may indicate that a drop has been
         double counted
+        * Poor battery health
+        * Poor device health
     """
     found_issues: list[AuditErrorP] = []
 
@@ -61,7 +65,15 @@ def _audit_dropmate(
     min_firmware: float,
     max_scanned_time_delta_sec: int,
 ) -> list[AuditErrorP]:
-    """Audit for issues with firmware version and delta between internal and external clocks."""
+    """
+    Audit for device-specific issues.
+
+    Currently included audits:
+        * Firmware version
+        * Delta between internal and external clocks
+        * Battery health
+        * Device health
+    """
     found_issues: list[AuditErrorP] = []
 
     if dropmate.firmware_version < min_firmware:
@@ -70,6 +82,12 @@ def _audit_dropmate(
     internal_timedelta = dropmate.last_scanned_time_utc - dropmate.dropmate_internal_time_utc
     if abs(internal_timedelta.total_seconds()) > max_scanned_time_delta_sec:
         found_issues.append(InternalClockDeltaError(dropmate, internal_timedelta.total_seconds()))
+
+    if dropmate.battery is Health.POOR:
+        found_issues.append(BatteryHealthError(dropmate))
+
+    if dropmate.device_health is Health.POOR:
+        found_issues.append(DeviceHealthError(dropmate))
 
     return found_issues
 

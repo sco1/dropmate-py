@@ -11,6 +11,8 @@ DROPMATE_P = partial(
     parser.Dropmate,
     uid="ABC123",
     drops=[],
+    battery=parser.Health.GOOD,
+    device_health=parser.Health.GOOD,
     firmware_version=5.1,
     dropmate_internal_time_utc=DATE_P(hour=12, minute=30),
     last_scanned_time_utc=DATE_P(hour=12, minute=30),
@@ -115,6 +117,8 @@ def test_audit_drops(dropmate: parser.Dropmate, n_expected_errors: int) -> None:
 DROPMATE_AUDIT_CASES = (
     (DROPMATE_P(), 0),
     (DROPMATE_P(firmware_version=1.0), 1),
+    (DROPMATE_P(battery=parser.Health.POOR), 1),
+    (DROPMATE_P(device_health=parser.Health.POOR), 1),
     (
         DROPMATE_P(
             dropmate_internal_time_utc=DATE_P(hour=14, minute=30),

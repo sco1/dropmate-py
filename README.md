@@ -51,6 +51,8 @@ The following audits are supported:
 * Minimum Dropmate Firmware Version
 * Dropmate Internal Clock Drift
   * Measured as the delta between the scanning device's clock at scan time and the Dropmate's internal clock
+* Battery health
+* Device health
 
 ### Environment Variables
 The following environment variables are provided to help customize pipeline behaviors.
