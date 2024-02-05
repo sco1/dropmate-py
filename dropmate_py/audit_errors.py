@@ -8,8 +8,7 @@ class AuditErrorBase(Exception):
 
 
 class AuditErrorP(t.Protocol):
-    def __str__(self) -> str:
-        ...
+    def __str__(self) -> str: ...
 
 
 class DropmateAuditErrorBase(AuditErrorBase):
