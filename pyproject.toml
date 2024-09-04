@@ -1,12 +1,15 @@
-[tool.poetry]
+[project]
 name = "dropmate-py"
 version = "1.0.0"
 description = "Python helpers for the EDC Dropmate"
-authors = ["sco1 <sco1.git@gmail.com>"]
+authors = [
+    {name = "sco1", email = "sco1.git@gmail.com"}
+]
+maintainers = [
+    {name = "sco1", email = "sco1.git@gmail.com"}
+]
 
 readme = "README.md"
-homepage = "https://github.com/sco1/"
-repository = "https://github.com/sco1/dropmate-py"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -15,42 +18,44 @@ classifiers = [
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
 ]
 
-include = [
-    {path = "./CHANGELOG.md", format = "sdist"}
+requires-python = ">=3.11"
+dependencies = [
+    "python-dotenv~=1.0",
+    "sco1-misc~=0.1",
+    "typer-slim~=0.12",
 ]
 
-[tool.poetry.urls]
-"Issue Tracker" = "https://github.com/sco1/dropmate-py/issues"
+[project.urls]
+Homepage = "https://github.com/sco1/"
+Documentation = "https://github.com/sco1/dropmate-py/blob/main/README.md"
+Repository = "https://github.com/sco1/dropmate-py"
+Issues = "https://github.com/sco1/dropmate-py/issues"
+Changelog = "https://github.com/sco1/dropmate-py/blob/main/CHANGELOG.md"
 
-[tool.poetry.scripts]
+[project.scripts]
 dropmate = "dropmate_py.cli:dropmate_cli"
 
-[tool.poetry.dependencies]
-python = "^3.11"
-python-dotenv = "^1.0"
-sco1-misc = "^0.1"
-typer = "^0.9"
-
-[tool.poetry.dev-dependencies]
-black = "^23.1"
-bump2version = "^1.0"
-cogapp = "^3.3"
-flake8 = "^6.0"
-flake8-annotations = "^3.0"
-flake8-bugbear = "^23.1"
-flake8-docstrings = "^1.7"
-flake8-fixme = "^1.1"
-isort = "^5.12"
-mypy = "^1.0"
-pep8-naming = "^0.13"
-pre-commit = "^3.0"
-pytest = "^7.2"
-pytest-cov = "^4.0"
-pytest-randomly = "^3.12"
-tox = "^4.4"
+[tool.uv]
+dev-dependencies = [
+    "black~=24.8",
+    "bump2version~=1.0",
+    "cogapp~=3.4",
+    "flake8~=7.1",
+    "flake8-annotations~=3.1",
+    "isort~=5.13",
+    "mypy~=1.11",
+    "pre-commit~=3.8",
+    "pytest~=8.3",
+    "pytest-cov~=5.0",
+    "pytest-randomly~=3.15",
+    "ruff~=0.6",
+    "tox~=4.18",
+    "tox-uv~=1.11",
+]
 
 [tool.black]
 line-length = 100
@@ -77,5 +82,5 @@ warn_unused_configs = true
 warn_unused_ignores = true
 
 [build-system]
-requires = ["poetry-core>=1.2"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"

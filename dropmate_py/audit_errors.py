@@ -3,7 +3,7 @@ import typing as t
 from dropmate_py.parser import DropRecord, Dropmate
 
 
-class AuditErrorBase(Exception):
+class AuditErrorBase(Exception):  # noqa: N818
     pass
 
 

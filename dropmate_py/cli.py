@@ -42,7 +42,7 @@ def audit(
                 ],
             )
         except ValueError:
-            raise click.ClickException("No file selected for processing, aborting.")
+            raise click.ClickException("No file selected for processing, aborting.") from None
 
     conslidated_log = log_parse_pipeline(log_filepath)
     found_errs = audit_pipeline(
@@ -75,7 +75,7 @@ def audit_bulk(
                 title="Select directory for batch processing", start_dir=PROMPT_START_DIR
             )
         except ValueError:
-            raise click.ClickException("No directory selected for processing, aborting.")
+            raise click.ClickException("No directory selected for processing, aborting.") from None
 
     log_files = list(log_dir.glob(log_pattern))
     print(f"Found {len(log_files)} log files to process.")
@@ -112,7 +112,7 @@ def consolidate(
                 title="Select directory for batch processing", start_dir=PROMPT_START_DIR
             )
         except ValueError:
-            raise click.ClickException("No directory selected for processing, aborting.")
+            raise click.ClickException("No directory selected for processing, aborting.") from None
 
     log_files = list(log_dir.glob(log_pattern))
     print(f"Found {len(log_files)} log files to consolidate.")
