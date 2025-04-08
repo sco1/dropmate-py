@@ -2,10 +2,9 @@
 name = "dropmate-py"
 version = "1.0.0"
 description = "Python helpers for the EDC Dropmate"
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
-    {name = "sco1", email = "sco1.git@gmail.com"}
-]
-maintainers = [
     {name = "sco1", email = "sco1.git@gmail.com"}
 ]
 
@@ -13,7 +12,6 @@ readme = "README.md"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.11",
@@ -41,11 +39,11 @@ dropmate = "dropmate_py.cli:dropmate_cli"
 
 [tool.uv]
 dev-dependencies = [
-    "black~=24.8",
+    "black~=25.0",
     "cogapp~=3.4",
     "flake8~=7.1",
     "flake8-annotations~=3.1",
-    "isort~=5.13",
+    "isort~=6.0",
     "mypy~=1.11",
     "pre-commit~=4.0",
     "pytest~=8.3",
