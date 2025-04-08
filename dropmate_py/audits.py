@@ -50,7 +50,7 @@ def _audit_drops(
     # indicating that a jump may have ended prematurely
     # We shouldn't have enough records where performance is critical, so we can just do a new loop
     # rather than complicating the altitude checking one
-    for prev_rec, next_rec in zip(dropmate.drops, dropmate.drops[1:]):
+    for prev_rec, next_rec in zip(dropmate.drops, dropmate.drops[1:], strict=False):
         next_start = next_rec.start_time_utc
         prev_end = prev_rec.end_time_utc
         start_delta = (next_start - prev_end).total_seconds()  # type: ignore[operator]
